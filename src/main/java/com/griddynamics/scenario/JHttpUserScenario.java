@@ -28,4 +28,8 @@ public class JHttpUserScenario {
     public String getScenarioName() {
         return scenarioName;
     }
+
+    public JHttpUserScenarioStep getUserScenario(int index) {
+        return userScenarioSteps.get(index);
+    }
 }

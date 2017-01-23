@@ -4,11 +4,13 @@ import com.griddynamics.jagger.invoker.InvocationException;
 import com.griddynamics.jagger.invoker.Invoker;
 import com.griddynamics.jagger.invoker.v2.JHttpResponse;
 import com.griddynamics.jagger.invoker.v2.SpringBasedHttpClient;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+
+import static com.griddynamics.util.UserStepMetricNameUtil.getMetricDisplayName;
+import static com.griddynamics.util.UserStepMetricNameUtil.getMetricId;
 
 public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocationResult, JHttpUserScenario> {
 
@@ -23,8 +25,10 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
         HashMap<String, String> metricsDisplayName = new HashMap<>();
 
         for (JHttpUserScenarioStep userScenarioStep : scenario.userScenarioSteps) {
-            String displayName = getDisplayName(scenario, userScenarioStep);
-            metricsDisplayName.putIfAbsent(userScenarioStep.getId(), displayName);
+            String id = getMetricId(scenario, userScenarioStep);
+            String displayName = getMetricDisplayName(userScenarioStep);
+
+            metricsDisplayName.putIfAbsent(id, displayName);
 
             userScenarioStep.preProcess(previousStep);
 
@@ -36,7 +40,7 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
             long requestEndTime = System.nanoTime();
             Double requestTimeInMilliseconds = (requestEndTime - requestStartTime) / 1_000_000.0;
 
-            requestTimeStorage.put(userScenarioStep.getId(), requestTimeInMilliseconds);
+            requestTimeStorage.put(id, requestTimeInMilliseconds);
 
             userScenarioStep.waitAfterExecution();
             userScenarioStep.postProcess(response);
@@ -47,8 +51,5 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
         return new ExampleInvocationResult(requestTimeStorage, metricsDisplayName, scenario.getScenarioId(), scenario.getScenarioName());
     }
 
-    private String getDisplayName(JHttpUserScenario scenario, JHttpUserScenarioStep userScenarioStep) {
-        String prefix = scenario.getScenarioName() + "-" + userScenarioStep.getStepNumber() + "-";
-        return StringUtils.isBlank(userScenarioStep.getDisplayName()) ? prefix + userScenarioStep.getId() : prefix + userScenarioStep.getDisplayName();
-    }
+
 }

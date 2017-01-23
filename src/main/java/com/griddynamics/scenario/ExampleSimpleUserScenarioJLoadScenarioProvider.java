@@ -5,6 +5,11 @@ import com.griddynamics.jagger.user.test.configurations.JLoadTest;
 import com.griddynamics.jagger.user.test.configurations.JParallelTestsGroup;
 import com.griddynamics.jagger.user.test.configurations.JTestDefinition;
 import com.griddynamics.jagger.user.test.configurations.auxiliary.Id;
+import com.griddynamics.jagger.user.test.configurations.limits.JLimit;
+import com.griddynamics.jagger.user.test.configurations.limits.JLimitVsRefValue;
+import com.griddynamics.jagger.user.test.configurations.limits.auxiliary.LowErrThresh;
+import com.griddynamics.jagger.user.test.configurations.limits.auxiliary.RefValue;
+import com.griddynamics.jagger.user.test.configurations.limits.auxiliary.UpErrThresh;
 import com.griddynamics.jagger.user.test.configurations.load.JLoadProfile;
 import com.griddynamics.jagger.user.test.configurations.load.JLoadProfileInvocation;
 import com.griddynamics.jagger.user.test.configurations.load.auxiliary.InvocationCount;
@@ -19,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import static com.griddynamics.scenario.DefaultAggregatorsProvider.AVG_AGGREGATOR;
 import static com.griddynamics.scenario.DefaultAggregatorsProvider.MAX_AGGREGATOR;
 import static com.griddynamics.scenario.DefaultAggregatorsProvider.MIN_AGGREGATOR;
+import static com.griddynamics.util.UserStepMetricNameUtil.getMetricId;
 import static java.util.Arrays.asList;
 
 // begin: following section is used for docu generation - Load test scenario configuration
@@ -28,7 +34,10 @@ public class ExampleSimpleUserScenarioJLoadScenarioProvider {
     @Bean
     public JLoadScenario exampleSimpleJaggerLoadScenarioUS() {
 
-        JTestDefinition jTestDefinition = JTestDefinition.builder(Id.of("td_example"), new ExampleUserScenarioProvider())
+        ExampleUserScenarioProvider userScenarioProvider = new ExampleUserScenarioProvider();
+        JHttpUserScenario userScenario = userScenarioProvider.iterator().next();
+
+        JTestDefinition jTestDefinition = JTestDefinition.builder(Id.of("td_example"), userScenarioProvider)
                 .withInvoker(new JHttpUserScenarioInvokerProvider())
                 .addListener(new ExampleUserScenarioInvocationListener(asList(AVG_AGGREGATOR, MIN_AGGREGATOR, MAX_AGGREGATOR)))
                 .build();
@@ -37,7 +46,13 @@ public class ExampleSimpleUserScenarioJLoadScenarioProvider {
 
         JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations.of(IterationsNumber.of(500), MaxDurationInSeconds.of(15));
 
-        JLoadTest jLoadTest = JLoadTest.builder(Id.of("lt_example"), jTestDefinition, jLoadProfileInvocations, jTerminationCriteria).build();
+        JLimit firstStepLimit = JLimitVsRefValue.builder(getMetricId(userScenario, userScenario.getUserScenario(0)), RefValue.of(300D))
+                .withOnlyErrors(LowErrThresh.of(0.99), UpErrThresh.of(1.01))
+                .build();
+
+        JLoadTest jLoadTest = JLoadTest.builder(Id.of("lt_example"), jTestDefinition, jLoadProfileInvocations, jTerminationCriteria)
+                .withLimits(firstStepLimit)
+                .build();
 
         JParallelTestsGroup jParallelTestsGroup = JParallelTestsGroup.builder(Id.of("ptg_example"), jLoadTest).build();
 
