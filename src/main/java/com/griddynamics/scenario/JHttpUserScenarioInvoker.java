@@ -32,6 +32,7 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
 
             userScenarioStep.preProcess(previousStep);
 
+            log.info("Step {}: {}", userScenarioStep.getStepNumber(), userScenarioStep.getId());
             log.info("Endpoint: {}", userScenarioStep.getEndpoint());
             log.info("Query: {}", userScenarioStep.getQuery());
 
