@@ -25,9 +25,10 @@ public class ExampleUserScenarioProvider implements Iterable {
                 .addStep(JHttpUserScenarioStep.builder("step2", new JHttpEndpoint("https://httpbin.org/"))
                         .withDisplayName("Step #2")
                         .withQuery(new JHttpQuery().get().path("/get"))
-                        .withResponseConsumer(response -> {
+                        .withResponseFunction(response -> {
                             if (response.getStatus().is2xxSuccessful())
                                 log.info("Step 2 is successful!");
+                            return true;
                         })
                         .build())
                 .addStep(JHttpUserScenarioStep.builder("step3", new JHttpEndpoint("https://httpbin.org/"))
@@ -40,10 +41,11 @@ public class ExampleUserScenarioProvider implements Iterable {
                             currentStep.setEndpoint(new JHttpEndpoint("http://www.scala-lang.org"));
                             currentStep.setQuery(new JHttpQuery().get().path("/"));
                         })
-                        .withResponseConsumer(response -> {
+                        .withResponseFunction(response -> {
                             String header = response.getHeaders().getFirst("key");
                             if (header != null)
                                 log.info("Got header: key=" + header);
+                            return false;
                         })
                         .build());
 

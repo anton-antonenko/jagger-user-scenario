@@ -43,7 +43,11 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
             requestTimeStorage.put(id, requestTimeInMilliseconds);
 
             userScenarioStep.waitAfterExecution();
-            userScenarioStep.postProcess(response);
+            Boolean succeeded = userScenarioStep.postProcess(response);
+            if (!succeeded) {
+                log.info("Step {} post process returned false! Stopping scenario (next steps won't be executed).", userScenarioStep.getId());
+                break;
+            }
 
             previousStep = userScenarioStep;
         }

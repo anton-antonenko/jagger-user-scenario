@@ -46,7 +46,8 @@ public class ExampleSimpleUserScenarioJLoadScenarioProvider {
 
         JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations.of(IterationsNumber.of(500), MaxDurationInSeconds.of(15));
 
-        JLimit firstStepLimit = JLimitVsRefValue.builder(getMetricId(userScenario, userScenario.getUserScenario(0)), RefValue.of(300D))
+        String metricId = getMetricId(userScenario, userScenario.getUserScenarioStep(0));
+        JLimit firstStepLimit = JLimitVsRefValue.builder(metricId + "-avg", RefValue.of(300D))
                 .withOnlyErrors(LowErrThresh.of(0.99), UpErrThresh.of(1.01))
                 .build();
 

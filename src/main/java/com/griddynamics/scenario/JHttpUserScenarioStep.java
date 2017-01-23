@@ -8,6 +8,7 @@ import com.griddynamics.util.CopyUtil;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class JHttpUserScenarioStep {
     private int stepNumber;
@@ -19,7 +20,7 @@ public class JHttpUserScenarioStep {
     private final String displayName;
     private final Consumer<JHttpUserScenarioStep> previousStepConsumer;
     private final BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
-    private final Consumer<JHttpResponse> responseConsumer;
+    private final Function<JHttpResponse, Boolean> responseFunction;
 
     /**
      * Can work with results from the previous step and set proper values for endpoint & query.
@@ -36,10 +37,11 @@ public class JHttpUserScenarioStep {
     /** Can work with response.
      * @param response result of execution of request
      */
-    public void postProcess(JHttpResponse response) {
+    public Boolean postProcess(JHttpResponse response) {
         this.response = response;
-        if (responseConsumer != null)
-            responseConsumer.accept(CopyUtil.copyOf(response));
+        if (responseFunction != null)
+            return responseFunction.apply(CopyUtil.copyOf(response));
+        return true;
     }
 
     public void waitAfterExecution() {
@@ -60,7 +62,7 @@ public class JHttpUserScenarioStep {
         this.displayName = builder.displayName;
         this.previousStepConsumer = builder.previousStepConsumer;
         this.previousAndCurrentStepConsumer = builder.previousAndCurrentStepConsumer;
-        this.responseConsumer = builder.responseConsumer;
+        this.responseFunction = builder.responseFunction;
     }
 
     public static Builder builder(String id, JHttpEndpoint endpoint) {
@@ -75,7 +77,7 @@ public class JHttpUserScenarioStep {
         private String displayName;
         private Consumer<JHttpUserScenarioStep> previousStepConsumer;
         private BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
-        private Consumer<JHttpResponse> responseConsumer;
+        private Function<JHttpResponse, Boolean> responseFunction;
 
         private Builder(String id, JHttpEndpoint endpoint) {
             this.id = id;
@@ -107,8 +109,8 @@ public class JHttpUserScenarioStep {
             return this;
         }
 
-        public Builder withResponseConsumer(Consumer<JHttpResponse> responseConsumer) {
-            this.responseConsumer = responseConsumer;
+        public Builder withResponseFunction(Function<JHttpResponse, Boolean> responseFunction) {
+            this.responseFunction = responseFunction;
             return this;
         }
 

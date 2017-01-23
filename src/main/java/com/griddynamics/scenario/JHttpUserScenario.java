@@ -3,6 +3,8 @@ package com.griddynamics.scenario;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
+
 public class JHttpUserScenario {
     private Integer stepsCounter = 0;
     private final String scenarioId;
@@ -15,10 +17,17 @@ public class JHttpUserScenario {
     }
 
     public JHttpUserScenario addStep (JHttpUserScenarioStep userScenarioStep) {
+        if (!isStepIdUnique(userScenarioStep.getId())) {
+            throw new IllegalArgumentException(format("Step id '%s' is not unique!", userScenarioStep.getId()));
+        }
         stepsCounter++;
         userScenarioStep.setStepNumber(stepsCounter);
         userScenarioSteps.add(userScenarioStep);
         return this;
+    }
+
+    private boolean isStepIdUnique(String id) {
+        return userScenarioSteps.stream().map(JHttpUserScenarioStep::getId).noneMatch(stepId -> stepId.equals(id));
     }
 
     public String getScenarioId() {
@@ -29,7 +38,7 @@ public class JHttpUserScenario {
         return scenarioName;
     }
 
-    public JHttpUserScenarioStep getUserScenario(int index) {
+    public JHttpUserScenarioStep getUserScenarioStep(int index) {
         return userScenarioSteps.get(index);
     }
 }
