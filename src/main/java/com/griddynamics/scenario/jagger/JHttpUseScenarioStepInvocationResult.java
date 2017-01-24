@@ -1,14 +1,14 @@
-package com.griddynamics.scenario;
+package com.griddynamics.scenario.jagger;
 
 import java.util.Map;
 
-public class ExampleInvocationResult {
+public class JHttpUseScenarioStepInvocationResult {
     private final Map<String, Double> requestTimeStorage;
     private final Map<String, String> metricsDisplayName;
     private final String scenarioMetricId;
     private final String scenarioMetricDisplayName;
 
-    public ExampleInvocationResult(Map<String, Double> requestTimeStorage, Map<String, String> metricsDisplayName, String scenarioMetricId, String scenarioMetricDisplayName) {
+    public JHttpUseScenarioStepInvocationResult(Map<String, Double> requestTimeStorage, Map<String, String> metricsDisplayName, String scenarioMetricId, String scenarioMetricDisplayName) {
         this.requestTimeStorage = requestTimeStorage;
         this.metricsDisplayName = metricsDisplayName;
         this.scenarioMetricId = scenarioMetricId;

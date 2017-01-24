@@ -1,4 +1,4 @@
-package com.griddynamics.scenario;
+package com.griddynamics.scenario.jagger;
 
 import java.util.ArrayList;
 import java.util.List;
