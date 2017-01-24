@@ -1,4 +1,4 @@
-package com.griddynamics.scenario;
+package com.griddynamics.scenario.jagger;
 
 import com.griddynamics.jagger.engine.e1.Provider;
 import com.griddynamics.jagger.invoker.Invoker;

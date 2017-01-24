@@ -1,7 +1,7 @@
-package com.griddynamics.util;
+package com.griddynamics.scenario.jagger;
 
-import com.griddynamics.scenario.JHttpUserScenario;
-import com.griddynamics.scenario.JHttpUserScenarioStep;
+import com.griddynamics.scenario.jagger.JHttpUserScenario;
+import com.griddynamics.scenario.jagger.JHttpUserScenarioStep;
 import org.apache.commons.lang3.StringUtils;
 
 public class UserStepMetricNameUtil {

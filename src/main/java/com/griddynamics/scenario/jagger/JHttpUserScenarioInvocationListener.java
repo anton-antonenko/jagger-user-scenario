@@ -1,4 +1,4 @@
-package com.griddynamics.scenario;
+package com.griddynamics.scenario.jagger;
 
 import com.griddynamics.jagger.engine.e1.Provider;
 import com.griddynamics.jagger.engine.e1.collector.MetricAggregatorProvider;
@@ -14,16 +14,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-public class ExampleUserScenarioInvocationListener extends ServicesAware implements Provider<InvocationListener> {
+public class JHttpUserScenarioInvocationListener extends ServicesAware implements Provider<InvocationListener> {
 
     private final Set<String> createdMetrics = new ConcurrentSkipListSet<>();
     private List<MetricAggregatorProvider> aggregatorProviders = new ArrayList<>();
 
-    public ExampleUserScenarioInvocationListener() {}
+    public JHttpUserScenarioInvocationListener() {}
 
-    public ExampleUserScenarioInvocationListener(List<MetricAggregatorProvider> aggregatorProviders) {
+    //??? do we need builder?
+    public JHttpUserScenarioInvocationListener(List<MetricAggregatorProvider> aggregatorProviders) {
         this.aggregatorProviders = aggregatorProviders;
     }
+
+    //??? we need additionally SR and SR[number of fails] per step
 
     @Override
     protected void init() {}
@@ -37,7 +40,7 @@ public class ExampleUserScenarioInvocationListener extends ServicesAware impleme
             @Override
             public void onSuccess(InvocationInfo invocationInfo) {
                 if (invocationInfo.getResult() != null) {
-                    ExampleInvocationResult invocationResult = ((ExampleInvocationResult) invocationInfo.getResult());
+                    JHttpUseScenarioStepInvocationResult invocationResult = ((JHttpUseScenarioStepInvocationResult) invocationInfo.getResult());
                     Map<String, String> metricsDisplayName = invocationResult.getMetricsDisplayName();
 
                     if (!createdMetrics.contains(invocationResult.getScenarioMetricId())) {
@@ -58,6 +61,7 @@ public class ExampleUserScenarioInvocationListener extends ServicesAware impleme
             }
 
             private void createScenarioMetricDescription(String metricId, String metricDisplayName) {
+                // ??? scenario metric display name for latency, should have ', ms'
                 getMetricService().createMetric(new MetricDescription(metricId)
                         .displayName(metricDisplayName)
                         .showSummary(true)
@@ -66,6 +70,7 @@ public class ExampleUserScenarioInvocationListener extends ServicesAware impleme
             }
 
             private void createStepMetricDescription(String metricId, String metricDisplayName) {
+                // ??? step metric display name for latency, should have ', ms'
                 MetricDescription metricDescription = new MetricDescription(metricId).displayName(metricDisplayName).showSummary(true).plotData(true);
                 aggregatorProviders.forEach(metricDescription::addAggregator);
                 getMetricService().createMetric(metricDescription);

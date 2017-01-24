@@ -2,6 +2,8 @@ package com.griddynamics.scenario;
 
 import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpQuery;
+import com.griddynamics.scenario.jagger.JHttpUserScenario;
+import com.griddynamics.scenario.jagger.JHttpUserScenarioStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
