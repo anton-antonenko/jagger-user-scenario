@@ -27,7 +27,6 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
         for (JHttpUserScenarioStep userScenarioStep : scenario.userScenarioSteps) {
             String id = getMetricId(scenario, userScenarioStep);
             String displayName = getMetricDisplayName(userScenarioStep);
-
             metricsDisplayName.putIfAbsent(id, displayName);
 
             userScenarioStep.preProcess(previousStep);
@@ -38,15 +37,13 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
 
             long requestStartTime = System.nanoTime();
             JHttpResponse response = httpClient.execute(userScenarioStep.getEndpoint(), userScenarioStep.getQuery());
-            long requestEndTime = System.nanoTime();
-            Double requestTimeInMilliseconds = (requestEndTime - requestStartTime) / 1_000_000.0;
-
+            Double requestTimeInMilliseconds = (System.nanoTime() - requestStartTime) / 1_000_000.0;
             requestTimeStorage.put(id, requestTimeInMilliseconds);
 
             userScenarioStep.waitAfterExecution();
             Boolean succeeded = userScenarioStep.postProcess(response);
             if (!succeeded) {
-                log.info("Step {} post process returned false! Stopping scenario (next steps won't be executed).", userScenarioStep.getId());
+                log.warn("Step {} post process returned false! Stopping scenario (next steps won't be executed).", userScenarioStep.getId());
                 break;
             }
 
@@ -55,6 +52,4 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
 
         return new ExampleInvocationResult(requestTimeStorage, metricsDisplayName, scenario.getScenarioId(), scenario.getScenarioName());
     }
-
-
 }

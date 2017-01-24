@@ -10,6 +10,11 @@ public class UserStepMetricNameUtil {
         return prefix + userScenarioStep.getId();
     }
 
+    public static String getMetricId(String scenarioId, String userScenarioStepId, int userScenarioNumber) {
+        String prefix = scenarioId + "-" + userScenarioNumber + "-";
+        return prefix + userScenarioStepId;
+    }
+
     public static String getMetricDisplayName(JHttpUserScenarioStep userScenarioStep) {
         String prefix = userScenarioStep.getStepNumber() + ". ";
         return StringUtils.isBlank(userScenarioStep.getDisplayName()) ? prefix + userScenarioStep.getId() : prefix + userScenarioStep.getDisplayName();
