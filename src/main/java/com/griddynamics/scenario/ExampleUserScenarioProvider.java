@@ -12,19 +12,24 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ExampleUserScenarioProvider implements Iterable {
+    public static final String SCENARIO_ID = "my-user-scenario";
+    public static final String SCENARIO_DISPLAY_NAME = "My User Scenario";
+    public static final String STEP_1_ID = "step321";
+    public static final String STEP_2_ID = "step2";
+    public static final String STEP_3_ID = "step3";
     private static Logger log = LoggerFactory.getLogger(ExampleUserScenarioProvider.class);
 
     private List<JHttpUserScenario> userScenarios = new ArrayList<>();
 
     public ExampleUserScenarioProvider() {
-        JHttpUserScenario userScenario = new JHttpUserScenario("my-user-scenario", "My User Scenario Duration, ms");
+        JHttpUserScenario userScenario = new JHttpUserScenario(SCENARIO_ID, SCENARIO_DISPLAY_NAME);
 
         userScenario
-                .addStep(JHttpUserScenarioStep.builder("step321", new JHttpEndpoint("https://httpbin.org/"))
+                .addStep(JHttpUserScenarioStep.builder(STEP_1_ID, new JHttpEndpoint("https://httpbin.org/"))
                         .withDisplayName("Step #321")
                         .withWaitAfterExecutionInSeconds(1)
                         .build())
-                .addStep(JHttpUserScenarioStep.builder("step2", new JHttpEndpoint("https://httpbin.org/"))
+                .addStep(JHttpUserScenarioStep.builder(STEP_2_ID, new JHttpEndpoint("https://httpbin.org/"))
                         .withDisplayName("Step #2")
                         .withQuery(new JHttpQuery().get().path("/get"))
                         .withResponseFunction(response -> {
@@ -33,7 +38,7 @@ public class ExampleUserScenarioProvider implements Iterable {
                             return true;
                         })
                         .build())
-                .addStep(JHttpUserScenarioStep.builder("step3", new JHttpEndpoint("https://httpbin.org/"))
+                .addStep(JHttpUserScenarioStep.builder(STEP_3_ID, new JHttpEndpoint("https://httpbin.org/"))
                         .withDisplayName("Step #3")
                         .withQuery(new JHttpQuery().get().path("/response-headers?key=val"))
                         // VERY IMPORTANT: if use withPreviousStepConsumer(BiConsumer) arguments order of lambda must be exactly

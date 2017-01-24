@@ -4,9 +4,9 @@ import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpQuery;
 import com.griddynamics.jagger.invoker.v2.JHttpResponse;
 
+// TODO: move these methods as copy constructors to target classes
 public class CopyUtil {
 
-    // ??? should we make copy constructors for these classes
     public static JHttpEndpoint copyOf(JHttpEndpoint jHttpEndpoint) {
         if (jHttpEndpoint == null)
             return null;
