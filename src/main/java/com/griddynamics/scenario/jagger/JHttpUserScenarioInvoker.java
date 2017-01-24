@@ -1,4 +1,4 @@
-package com.griddynamics.scenario;
+package com.griddynamics.scenario.jagger;
 
 import com.griddynamics.jagger.invoker.InvocationException;
 import com.griddynamics.jagger.invoker.Invoker;
@@ -9,17 +9,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-import static com.griddynamics.util.UserStepMetricNameUtil.getMetricDisplayName;
-import static com.griddynamics.util.UserStepMetricNameUtil.getMetricId;
+import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.getMetricDisplayName;
+import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.getMetricId;
 
-public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocationResult, JHttpUserScenario> {
+public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUseScenarioStepInvocationResult, JHttpUserScenario> {
 
     private final SpringBasedHttpClient httpClient = new SpringBasedHttpClient();
 
     private static Logger log = LoggerFactory.getLogger(JHttpUserScenarioInvoker.class);
 
     @Override
-    public ExampleInvocationResult invoke(Void nothing, JHttpUserScenario scenario) throws InvocationException {
+    public JHttpUseScenarioStepInvocationResult invoke(Void nothing, JHttpUserScenario scenario) throws InvocationException {
         JHttpUserScenarioStep previousStep = null;
         HashMap<String, Double> requestTimeStorage = new HashMap<>();
         HashMap<String, String> metricsDisplayName = new HashMap<>();
@@ -53,7 +53,7 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, ExampleInvocation
             previousStep = userScenarioStep;
         }
 
-        return new ExampleInvocationResult(requestTimeStorage, metricsDisplayName, scenario.getScenarioId(), scenario.getScenarioName());
+        return new JHttpUseScenarioStepInvocationResult(requestTimeStorage, metricsDisplayName, scenario.getScenarioId(), scenario.getScenarioName());
     }
 
 

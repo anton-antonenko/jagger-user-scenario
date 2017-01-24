@@ -1,9 +1,8 @@
-package com.griddynamics.scenario;
+package com.griddynamics.scenario.jagger;
 
 import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpQuery;
 import com.griddynamics.jagger.invoker.v2.JHttpResponse;
-import com.griddynamics.util.CopyUtil;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;

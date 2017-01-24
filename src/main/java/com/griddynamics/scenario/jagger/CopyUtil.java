@@ -1,4 +1,4 @@
-package com.griddynamics.util;
+package com.griddynamics.scenario.jagger;
 
 import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpQuery;
@@ -6,6 +6,7 @@ import com.griddynamics.jagger.invoker.v2.JHttpResponse;
 
 public class CopyUtil {
 
+    // ??? should we make copy constructors for these classes
     public static JHttpEndpoint copyOf(JHttpEndpoint jHttpEndpoint) {
         if (jHttpEndpoint == null)
             return null;
