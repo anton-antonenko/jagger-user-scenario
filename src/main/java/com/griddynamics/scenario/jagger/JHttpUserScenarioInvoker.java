@@ -27,26 +27,28 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUseScenarioS
         for (JHttpUserScenarioStep userScenarioStep : scenario.userScenarioSteps) {
             String id = getMetricId(scenario, userScenarioStep);
             String displayName = getMetricDisplayName(userScenarioStep);
-
             metricsDisplayName.putIfAbsent(id, displayName);
 
+            // Pre process step: executed before request
             userScenarioStep.preProcess(previousStep);
 
             log.info("Step {}: {}", userScenarioStep.getStepNumber(), userScenarioStep.getId());
             log.info("Endpoint: {}", userScenarioStep.getEndpoint());
             log.info("Query: {}", userScenarioStep.getQuery());
 
+            // Request execution step
             long requestStartTime = System.nanoTime();
             JHttpResponse response = httpClient.execute(userScenarioStep.getEndpoint(), userScenarioStep.getQuery());
-            long requestEndTime = System.nanoTime();
-            Double requestTimeInMilliseconds = (requestEndTime - requestStartTime) / 1_000_000.0;
-
+            Double requestTimeInMilliseconds = (System.nanoTime() - requestStartTime) / 1_000_000.0;
             requestTimeStorage.put(id, requestTimeInMilliseconds);
 
+            // Wait after execution if need
             userScenarioStep.waitAfterExecution();
+
+            // Post process step: executed after request. If returned false, scenario invocation stops.
             Boolean succeeded = userScenarioStep.postProcess(response);
             if (!succeeded) {
-                log.info("Step {} post process returned false! Stopping scenario (next steps won't be executed).", userScenarioStep.getId());
+                log.warn("Step {} post process returned false! Stopping scenario (next steps won't be executed).", userScenarioStep.getId());
                 break;
             }
 
@@ -55,6 +57,4 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUseScenarioS
 
         return new JHttpUseScenarioStepInvocationResult(requestTimeStorage, metricsDisplayName, scenario.getScenarioId(), scenario.getScenarioName());
     }
-
-
 }
