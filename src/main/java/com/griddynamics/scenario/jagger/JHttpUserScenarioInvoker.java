@@ -67,8 +67,6 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
             }
         }
 
-        //??? additional metric per step - Iterations
-        //??? need additional validator for scenario success rate
         return new JHttpUserScenarioInvocationResult(stepInvocationResults, scenario.getScenarioId(), scenario.getScenarioName(), scenarioSucceeded);
     }
 }
