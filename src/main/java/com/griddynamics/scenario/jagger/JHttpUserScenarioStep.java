@@ -17,6 +17,7 @@ public class JHttpUserScenarioStep {
     private JHttpResponse response;
     private final long waitAfterExecutionInSeconds;
     private final String displayName;
+    //??? do we really need this one?
     private final Consumer<JHttpUserScenarioStep> previousStepConsumer;
     private final BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
     private final Function<JHttpResponse, Boolean> responseFunction;
@@ -98,17 +99,17 @@ public class JHttpUserScenarioStep {
             return this;
         }
 
-        public Builder withPreviousStepConsumer(Consumer<JHttpUserScenarioStep> previousStepConsumer) {
+        public Builder withPreProcessFunction(Consumer<JHttpUserScenarioStep> previousStepConsumer) {
             this.previousStepConsumer = previousStepConsumer;
             return this;
         }
 
-        public Builder withPreviousStepConsumer(BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer) {
+        public Builder withPreProcessFunction(BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer) {
             this.previousAndCurrentStepConsumer = previousAndCurrentStepConsumer;
             return this;
         }
 
-        public Builder withResponseFunction(Function<JHttpResponse, Boolean> responseFunction) {
+        public Builder withPostProcessFunction(Function<JHttpResponse, Boolean> responseFunction) {
             this.responseFunction = responseFunction;
             return this;
         }

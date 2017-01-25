@@ -9,6 +9,10 @@ public class JHttpUserScenario {
     private Integer stepsCounter = 0;
     private final String scenarioId;
     private final String scenarioName;
+    private String userName;
+    private String password;
+
+    //??? getter for the full list is missing
     List<JHttpUserScenarioStep> userScenarioSteps = new ArrayList<>();
 
     public JHttpUserScenario(String scenarioId, String scenarioName) {
@@ -23,6 +27,13 @@ public class JHttpUserScenario {
         stepsCounter++;
         userScenarioStep.setStepNumber(stepsCounter);
         userScenarioSteps.add(userScenarioStep);
+        return this;
+    }
+
+    //??? add builder in the future
+    public JHttpUserScenario withBasicAuth(String userName, String password) {
+        this.userName = userName;
+        this.password = password;
         return this;
     }
 
@@ -41,4 +52,13 @@ public class JHttpUserScenario {
     public JHttpUserScenarioStep getUserScenarioStep(int index) {
         return userScenarioSteps.get(index);
     }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
 }
