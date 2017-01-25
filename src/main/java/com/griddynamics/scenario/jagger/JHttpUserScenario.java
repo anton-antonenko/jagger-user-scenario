@@ -11,8 +11,6 @@ public class JHttpUserScenario {
     private final String scenarioName;
     private String userName;
     private String password;
-
-    //??? getter for the full list is missing
     List<JHttpUserScenarioStep> userScenarioSteps = new ArrayList<>();
 
     public JHttpUserScenario(String scenarioId, String scenarioName) {
@@ -47,6 +45,10 @@ public class JHttpUserScenario {
 
     public String getScenarioName() {
         return scenarioName;
+    }
+
+    public List<JHttpUserScenarioStep> getUserScenarioSteps() {
+        return userScenarioSteps;
     }
 
     public JHttpUserScenarioStep getUserScenarioStep(int index) {

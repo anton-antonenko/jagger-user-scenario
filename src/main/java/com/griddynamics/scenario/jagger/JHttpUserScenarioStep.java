@@ -6,7 +6,6 @@ import com.griddynamics.jagger.invoker.v2.JHttpResponse;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class JHttpUserScenarioStep {
@@ -17,8 +16,6 @@ public class JHttpUserScenarioStep {
     private JHttpResponse response;
     private final long waitAfterExecutionInSeconds;
     private final String displayName;
-    //??? do we really need this one?
-    private final Consumer<JHttpUserScenarioStep> previousStepConsumer;
     private final BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
     private final Function<JHttpResponse, Boolean> responseFunction;
 
@@ -29,8 +26,6 @@ public class JHttpUserScenarioStep {
     public void preProcess(JHttpUserScenarioStep previousStep) {
         if (previousAndCurrentStepConsumer != null) {
             previousAndCurrentStepConsumer.accept(previousStep, this);
-        } else if (previousStepConsumer != null) {
-            previousStepConsumer.accept(previousStep);
         }
     }
 
@@ -60,7 +55,6 @@ public class JHttpUserScenarioStep {
         this.query = builder.query;
         this.waitAfterExecutionInSeconds = builder.waitAfterExecutionInSeconds;
         this.displayName = builder.displayName;
-        this.previousStepConsumer = builder.previousStepConsumer;
         this.previousAndCurrentStepConsumer = builder.previousAndCurrentStepConsumer;
         this.responseFunction = builder.responseFunction;
     }
@@ -75,7 +69,6 @@ public class JHttpUserScenarioStep {
         private JHttpQuery query;
         private long waitAfterExecutionInSeconds;
         private String displayName;
-        private Consumer<JHttpUserScenarioStep> previousStepConsumer;
         private BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
         private Function<JHttpResponse, Boolean> responseFunction;
 
@@ -99,11 +92,6 @@ public class JHttpUserScenarioStep {
             return this;
         }
 
-        public Builder withPreProcessFunction(Consumer<JHttpUserScenarioStep> previousStepConsumer) {
-            this.previousStepConsumer = previousStepConsumer;
-            return this;
-        }
-
         public Builder withPreProcessFunction(BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer) {
             this.previousAndCurrentStepConsumer = previousAndCurrentStepConsumer;
             return this;
@@ -124,7 +112,7 @@ public class JHttpUserScenarioStep {
     }
 
     public JHttpEndpoint getEndpoint() {
-        return CopyUtil.copyOf(endpoint);
+        return endpoint;
     }
 
     /**
@@ -135,7 +123,7 @@ public class JHttpUserScenarioStep {
     }
 
     public JHttpQuery getQuery() {
-        return CopyUtil.copyOf(query);
+        return query;
     }
 
     /**

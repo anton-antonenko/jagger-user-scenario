@@ -14,6 +14,6 @@ public class UserStepMetricNameUtil {
 
     public static String getMetricDisplayName(JHttpUserScenarioStep userScenarioStep) {
         String prefix = userScenarioStep.getStepNumber() + ". ";
-        return prefix + (isBlank(userScenarioStep.getDisplayName()) ? userScenarioStep.getId() : userScenarioStep.getDisplayName()) + ", ms";
+        return prefix + (isBlank(userScenarioStep.getDisplayName()) ? userScenarioStep.getId() : userScenarioStep.getDisplayName());
     }
 }
