@@ -18,7 +18,6 @@ public class JHttpUserScenarioStep {
     private final String displayName;
     private final BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
     private final Function<JHttpResponse, Boolean> responseFunction;
-    private JHttpEndpoint globalEndpoint;
 
     /**
      * Can work with results from the previous step and set proper values for endpoint & query.
@@ -58,7 +57,6 @@ public class JHttpUserScenarioStep {
         this.displayName = builder.displayName;
         this.previousAndCurrentStepConsumer = builder.previousAndCurrentStepConsumer;
         this.responseFunction = builder.responseFunction;
-        this.globalEndpoint = builder.globalEndpoint;
     }
 
     public static Builder builder(String id, JHttpEndpoint endpoint) {
@@ -80,7 +78,6 @@ public class JHttpUserScenarioStep {
         private String displayName;
         private BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
         private Function<JHttpResponse, Boolean> responseFunction;
-        private JHttpEndpoint globalEndpoint;
 
         private Builder(String id, JHttpEndpoint endpoint) {
             this.id = id;
@@ -109,15 +106,6 @@ public class JHttpUserScenarioStep {
 
         public Builder withPostProcessFunction(Function<JHttpResponse, Boolean> responseFunction) {
             this.responseFunction = responseFunction;
-            return this;
-        }
-
-        /** Sets endpoint for current and next steps.
-         * Endpoint still can be overridden in {@link Builder#withPreProcessFunction}
-         * @param globalEndpoint global endpoint to set
-         */
-        public Builder withGlobalEndpoint(JHttpEndpoint globalEndpoint) {
-            this.globalEndpoint = globalEndpoint;
             return this;
         }
 
@@ -170,9 +158,5 @@ public class JHttpUserScenarioStep {
 
     public void setStepNumber(int stepNumber) {
         this.stepNumber = stepNumber;
-    }
-
-    public JHttpEndpoint getGlobalEndpoint() {
-        return globalEndpoint;
     }
 }

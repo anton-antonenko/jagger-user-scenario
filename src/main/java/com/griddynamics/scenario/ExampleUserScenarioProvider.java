@@ -36,9 +36,6 @@ public class ExampleUserScenarioProvider implements Iterable {
                         .build())
                 .addStep(JHttpUserScenarioStep.builder(STEP_2_ID)
                         .withDisplayName("Step #2")
-                        // withGlobalEndpoint on step level sets endpoint for current and next steps
-                        // still can be overridden in withPreProcessFunction()
-                        .withGlobalEndpoint(new JHttpEndpoint("http://httpbin.org/"))
                         .withQuery(new JHttpQuery().get().path("/get"))
                         .withPostProcessFunction(response -> {
                             if (response.getStatus().is2xxSuccessful())

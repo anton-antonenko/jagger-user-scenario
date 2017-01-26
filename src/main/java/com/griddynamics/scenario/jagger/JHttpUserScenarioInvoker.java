@@ -29,17 +29,6 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
         JHttpEndpoint globalEndpoint = scenario.getGlobalEndpoint();
 
         for (JHttpUserScenarioStep userScenarioStep : scenario.userScenarioSteps) {
-            // update global endpoint from step if present
-            if (userScenarioStep.getGlobalEndpoint() != null)
-                globalEndpoint = userScenarioStep.getGlobalEndpoint();
-            // use global endpoint for step if present
-            if (globalEndpoint != null)
-                userScenarioStep.setEndpoint(globalEndpoint);
-            // check endpoint for null
-            if (globalEndpoint == null && userScenarioStep.getEndpoint() == null)
-                throw new IllegalArgumentException("Endpoint must not be null! Please, set global endpoint or set endpoint for every step.");
-
-
             String metricId = getMetricId(scenario, userScenarioStep);
             String metricDisplayName = getMetricDisplayName(userScenarioStep);
 
@@ -49,6 +38,13 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
                 String value = Base64.getEncoder().encodeToString((scenario.getUserName() + ":" + scenario.getPassword()).getBytes());
                 userScenarioStep.getQuery().header("Authorization", "Basic " + value);
             }
+
+            // use global endpoint for step if present
+            if (globalEndpoint != null)
+                userScenarioStep.setEndpoint(globalEndpoint);
+            // check endpoint for null
+            if (globalEndpoint == null && userScenarioStep.getEndpoint() == null)
+                throw new IllegalArgumentException("Endpoint must not be null! Please, set global endpoint or set endpoint for every step.");
 
             // Pre process step: user actions executed before request
             userScenarioStep.preProcess(previousStep);
