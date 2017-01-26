@@ -63,6 +63,13 @@ public class JHttpUserScenarioStep {
         return new Builder(id, endpoint);
     }
 
+    /** Use this method only if you set global endpoint!!!
+     * @param id step id
+     */
+    public static Builder builder(String id) {
+        return new Builder(id, null);
+    }
+
     public static class Builder {
         private final String id;
         private final JHttpEndpoint endpoint;

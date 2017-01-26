@@ -17,7 +17,6 @@ public class ExampleUserScenarioProvider implements Iterable {
     public static final String STEP_1_ID = "step321";
     public static final String STEP_2_ID = "step2";
     public static final String STEP_3_ID = "step3";
-
     public static final String SCENARIO_ID_AUTH_AUTO = "my-user-scenario-basic-auth-auto";
     public static final String SCENARIO_DISPLAY_NAME_AUTH_AUTO = "Basic Auth User Scenario";
 
@@ -29,11 +28,13 @@ public class ExampleUserScenarioProvider implements Iterable {
         JHttpUserScenario userScenario = new JHttpUserScenario(SCENARIO_ID, SCENARIO_DISPLAY_NAME);
 
         userScenario
-                .addStep(JHttpUserScenarioStep.builder(STEP_1_ID, new JHttpEndpoint("https://httpbin.org/"))
+                // withGlobalEndpoint sets endpoint for all steps
+                .withGlobalEndpoint(new JHttpEndpoint("https://httpbin.org/"))
+                .addStep(JHttpUserScenarioStep.builder(STEP_1_ID)
                         .withDisplayName("Step #321")
                         .withWaitAfterExecutionInSeconds(1)
                         .build())
-                .addStep(JHttpUserScenarioStep.builder(STEP_2_ID, new JHttpEndpoint("https://httpbin.org/"))
+                .addStep(JHttpUserScenarioStep.builder(STEP_2_ID)
                         .withDisplayName("Step #2")
                         .withQuery(new JHttpQuery().get().path("/get"))
                         .withPostProcessFunction(response -> {
@@ -42,7 +43,7 @@ public class ExampleUserScenarioProvider implements Iterable {
                             return true;
                         })
                         .build())
-                .addStep(JHttpUserScenarioStep.builder(STEP_3_ID, new JHttpEndpoint("https://httpbin.org/"))
+                .addStep(JHttpUserScenarioStep.builder(STEP_3_ID)
                         .withDisplayName("Step #3")
                         .withQuery(new JHttpQuery().get().path("/response-headers?key=val"))
                         // VERY IMPORTANT: if use withPreProcessFunction(BiConsumer) arguments order of lambda must be exactly

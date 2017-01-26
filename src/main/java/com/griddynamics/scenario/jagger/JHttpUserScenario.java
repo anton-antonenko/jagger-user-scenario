@@ -1,5 +1,7 @@
 package com.griddynamics.scenario.jagger;
 
+import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ public class JHttpUserScenario {
     private String userName;
     private String password;
     List<JHttpUserScenarioStep> userScenarioSteps = new ArrayList<>();
+    private JHttpEndpoint globalEndpoint;
 
     public JHttpUserScenario(String scenarioId, String scenarioName) {
         this.scenarioId = scenarioId;
@@ -32,6 +35,15 @@ public class JHttpUserScenario {
     public JHttpUserScenario withBasicAuth(String userName, String password) {
         this.userName = userName;
         this.password = password;
+        return this;
+    }
+
+    /** Sets endpoint for all steps.
+     * Endpoint still can be overridden in {@link JHttpUserScenarioStep.Builder#withPreProcessFunction}
+     * @param globalEndpoint global endpoint to set
+     */
+    public JHttpUserScenario withGlobalEndpoint(JHttpEndpoint globalEndpoint) {
+        this.globalEndpoint = globalEndpoint;
         return this;
     }
 
@@ -63,4 +75,7 @@ public class JHttpUserScenario {
         return password;
     }
 
+    public JHttpEndpoint getGlobalEndpoint() {
+        return globalEndpoint;
+    }
 }
