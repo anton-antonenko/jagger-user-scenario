@@ -26,7 +26,8 @@ import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.STD_DE
 import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.SUCCESS_AGGREGATOR;
 
 public class JHttpUserScenarioInvocationListener extends ServicesAware implements Provider<InvocationListener> {
-
+    public static final String SUCCESS_RATE_METRIC_SUFFIX = "-sr";
+    public static final String ITERATIONS_METRIC_SUFFIX = "-iterations";
     private final Set<String> createdMetrics = new ConcurrentSkipListSet<>();
     private List<MetricAggregatorProvider> latencyAggregatorProviders = new ArrayList<>();
 
@@ -80,12 +81,12 @@ public class JHttpUserScenarioInvocationListener extends ServicesAware implement
                     if (!createdMetrics.contains(invocationResult.getScenarioMetricId())) {
                         createdMetrics.add(invocationResult.getScenarioMetricId());
                         createScenarioDurationMetricDescription(invocationResult.getScenarioMetricId(), invocationResult.getScenarioMetricDisplayName());
-                        createScenarioSuccessRateMetricDescription(invocationResult.getScenarioMetricId() + "-sr", invocationResult.getScenarioMetricDisplayName());
-                        createIterationsMetricDescription(invocationResult.getScenarioMetricId() + "-iterations", invocationResult.getScenarioMetricDisplayName());
+                        createScenarioSuccessRateMetricDescription(invocationResult.getScenarioMetricId() + SUCCESS_RATE_METRIC_SUFFIX, invocationResult.getScenarioMetricDisplayName());
+                        createIterationsMetricDescription(invocationResult.getScenarioMetricId() + ITERATIONS_METRIC_SUFFIX, invocationResult.getScenarioMetricDisplayName());
                     }
                     getMetricService().saveValue(invocationResult.getScenarioMetricId(), invocationInfo.getDuration());
-                    getMetricService().saveValue(invocationResult.getScenarioMetricId() + "-sr", invocationResult.getSucceeded() ? 1 : 0);
-                    getMetricService().saveValue(invocationResult.getScenarioMetricId() + "-iterations", 1);
+                    getMetricService().saveValue(invocationResult.getScenarioMetricId() + SUCCESS_RATE_METRIC_SUFFIX, invocationResult.getSucceeded() ? 1 : 0);
+                    getMetricService().saveValue(invocationResult.getScenarioMetricId() + ITERATIONS_METRIC_SUFFIX, 1);
 
                     stepInvocationResults.forEach(result -> {
                         String metricId = result.getMetricId();
@@ -93,12 +94,12 @@ public class JHttpUserScenarioInvocationListener extends ServicesAware implement
                             createdMetrics.add(metricId);
                             String displayName = result.getMetricDisplayName();
                             createStepLatencyMetricDescription(metricId, displayName);
-                            createStepSuccessRateMetricDescription(metricId + "-sr", displayName);
-                            createIterationsMetricDescription(metricId + "-iterations", displayName);
+                            createStepSuccessRateMetricDescription(metricId + SUCCESS_RATE_METRIC_SUFFIX, displayName);
+                            createIterationsMetricDescription(metricId + ITERATIONS_METRIC_SUFFIX, displayName);
                         }
                         getMetricService().saveValue(metricId, result.getLatency());
-                        getMetricService().saveValue(metricId + "-sr", result.getSucceeded() ? 1 : 0);
-                        getMetricService().saveValue(metricId + "-iterations", 1);
+                        getMetricService().saveValue(metricId + SUCCESS_RATE_METRIC_SUFFIX, result.getSucceeded() ? 1 : 0);
+                        getMetricService().saveValue(metricId + ITERATIONS_METRIC_SUFFIX, 1);
                     });
                 }
             }
