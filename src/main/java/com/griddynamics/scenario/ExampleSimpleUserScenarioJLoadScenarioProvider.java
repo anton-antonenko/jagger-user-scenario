@@ -34,7 +34,7 @@ public class ExampleSimpleUserScenarioJLoadScenarioProvider {
 
         JTestDefinition jTestDefinition = JTestDefinition.builder(Id.of("td_example"), new ExampleUserScenarioProvider())
                 .withInvoker(new JHttpUserScenarioInvokerProvider())
-                .addListener(JHttpUserScenarioInvocationListener.builder().withLatencyAggregators().withSuccessRateAggregators().build())
+                .addListener(new JHttpUserScenarioInvocationListener())
                 .build();
 
         JLoadProfile jLoadProfileInvocations = JLoadProfileInvocation.builder(InvocationCount.of(10), ThreadCount.of(1)).build();

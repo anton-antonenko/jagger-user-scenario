@@ -82,8 +82,7 @@ public class ExampleUserScenarioProvider implements Iterable {
                         .withWaitAfterExecutionInSeconds(2)
                         .withPreProcessFunction((prevStep, currentStep) -> {
                             // Reset all headers => auth will fail
-                            // ??? do we really need copyOf in the getter?
-                            currentStep.setQuery(currentStep.getQuery().headers(null));
+                            currentStep.getQuery().headers(null);
                         })
                         .withPostProcessFunction(response -> {
                             Boolean result = true;
