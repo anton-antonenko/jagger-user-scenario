@@ -2,6 +2,7 @@ package com.griddynamics.scenario.jagger;
 
 import com.griddynamics.jagger.invoker.InvocationException;
 import com.griddynamics.jagger.invoker.Invoker;
+import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpResponse;
 import com.griddynamics.jagger.invoker.v2.SpringBasedHttpClient;
 import org.slf4j.Logger;
@@ -25,8 +26,20 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
         Boolean scenarioSucceeded = true;
         JHttpUserScenarioStep previousStep = null;
         List<JHttpUserScenarioStepInvocationResult> stepInvocationResults = new ArrayList<>();
+        JHttpEndpoint globalEndpoint = scenario.getGlobalEndpoint();
 
         for (JHttpUserScenarioStep userScenarioStep : scenario.userScenarioSteps) {
+            // update global endpoint from step if present
+            if (userScenarioStep.getGlobalEndpoint() != null)
+                globalEndpoint = userScenarioStep.getGlobalEndpoint();
+            // use global endpoint for step if present
+            if (globalEndpoint != null)
+                userScenarioStep.setEndpoint(globalEndpoint);
+            // check endpoint for null
+            if (globalEndpoint == null && userScenarioStep.getEndpoint() == null)
+                throw new IllegalArgumentException("Endpoint must not be null! Please, set global endpoint or set endpoint for every step.");
+
+
             String metricId = getMetricId(scenario, userScenarioStep);
             String metricDisplayName = getMetricDisplayName(userScenarioStep);
 
