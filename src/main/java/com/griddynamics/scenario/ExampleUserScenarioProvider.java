@@ -2,6 +2,7 @@ package com.griddynamics.scenario;
 
 import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpQuery;
+import com.griddynamics.scenario.jagger.JHttpScenarioGlobalContext;
 import com.griddynamics.scenario.jagger.JHttpUserScenario;
 import com.griddynamics.scenario.jagger.JHttpUserScenarioStep;
 import org.slf4j.Logger;
@@ -28,8 +29,8 @@ public class ExampleUserScenarioProvider implements Iterable {
         JHttpUserScenario userScenario = new JHttpUserScenario(SCENARIO_ID, SCENARIO_DISPLAY_NAME);
 
         userScenario
-                // withGlobalEndpoint sets endpoint for all steps
-                .withGlobalEndpoint(new JHttpEndpoint("https://httpbin.org/"))
+                .withScenarioGlobalContext(new JHttpScenarioGlobalContext()
+                        .withGlobalEndpoint(new JHttpEndpoint("https://httpbin.org/")))
                 .addStep(JHttpUserScenarioStep.builder(STEP_1_ID)
                         .withDisplayName("Step #321")
                         .withWaitAfterExecutionInSeconds(1)
@@ -46,6 +47,9 @@ public class ExampleUserScenarioProvider implements Iterable {
                 .addStep(JHttpUserScenarioStep.builder(STEP_3_ID)
                         .withDisplayName("Step #3")
                         .withQuery(new JHttpQuery().get().path("/response-headers?key=val"))
+                        // global context can be changed here
+                        .withPreProcessGlobalContextFunction((prevStep, context) ->
+                                context.withGlobalHeaders(prevStep.getResponse().getHeaders()))
                         // VERY IMPORTANT: if use withPreProcessFunction(BiConsumer) arguments order of lambda must be exactly
                         // (prevStep, currentStep) and not (currentStep, prevStep)!!!
                         .withPreProcessFunction((prevStep, currentStep) -> {
@@ -58,13 +62,16 @@ public class ExampleUserScenarioProvider implements Iterable {
         JHttpUserScenario userScenarioBasicAuthAuto = new JHttpUserScenario(SCENARIO_ID_AUTH_AUTO, SCENARIO_DISPLAY_NAME_AUTH_AUTO);
 
         userScenarioBasicAuthAuto
-                .withBasicAuth("userName","userPassword")
-                .addStep(JHttpUserScenarioStep.builder("basic_auto_1", new JHttpEndpoint("https://httpbin.org"))
+                .withScenarioGlobalContext(new JHttpScenarioGlobalContext()
+                        .withGlobalEndpoint(new JHttpEndpoint("https://httpbin.org/"))
+                        .withBasicAuth("userName", "userPassword")
+                )
+                .addStep(JHttpUserScenarioStep.builder("basic_auto_1")
                         .withQuery(new JHttpQuery().get().path("/basic-auth/userName/userPassword"))
                         .withDisplayName("Expected auth pass")
                         .withWaitAfterExecutionInSeconds(2)
                         .build())
-                .addStep(JHttpUserScenarioStep.builder("basic_auto_2", new JHttpEndpoint("https://httpbin.org"))
+                .addStep(JHttpUserScenarioStep.builder("basic_auto_2")
                         .withQuery(new JHttpQuery().get().path("/basic-auth/userName/userPassword"))
                         .withDisplayName("Expected auth pass with validation")
                         .withWaitAfterExecutionInSeconds(2)
@@ -77,7 +84,7 @@ public class ExampleUserScenarioProvider implements Iterable {
                             return result;
                         })
                         .build())
-                .addStep(JHttpUserScenarioStep.builder("basic_auto_3", new JHttpEndpoint("https://httpbin.org"))
+                .addStep(JHttpUserScenarioStep.builder("basic_auto_3")
                         .withQuery(new JHttpQuery().get().path("/basic-auth/userName/userPassword"))
                         .withDisplayName("Expected auth fail with validation")
                         .withWaitAfterExecutionInSeconds(2)
@@ -93,9 +100,7 @@ public class ExampleUserScenarioProvider implements Iterable {
                             }
                             return result;
                         })
-                        .build())
-
-        ;
+                        .build());
 
         userScenarios.add(userScenario);
         userScenarios.add(userScenarioBasicAuthAuto);
