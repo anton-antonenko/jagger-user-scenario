@@ -47,9 +47,10 @@ public class ExampleUserScenarioProvider implements Iterable {
                 .addStep(JHttpUserScenarioStep.builder(STEP_3_ID)
                         .withDisplayName("Step #3")
                         .withQuery(new JHttpQuery().get().path("/response-headers?key=val"))
-                        // global context can be changed here
-                        .withPreProcessGlobalContextFunction((prevStep, context) ->
-                                context.withGlobalHeaders(prevStep.getResponse().getHeaders()))
+                        // global context can be changed here. E.g. we can add headers to all requests in this scenario
+                        .withPreProcessGlobalContextFunction((prevStep, context) -> {
+                            context.withGlobalHeaders(prevStep.getResponse().getHeaders());
+                        })
                         // VERY IMPORTANT: if use withPreProcessFunction(BiConsumer) arguments order of lambda must be exactly
                         // (prevStep, currentStep) and not (currentStep, prevStep)!!!
                         .withPreProcessFunction((prevStep, currentStep) -> {
