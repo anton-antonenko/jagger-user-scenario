@@ -1,5 +1,7 @@
 package com.griddynamics.scenario;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpQuery;
 import com.griddynamics.scenario.jagger.JHttpScenarioGlobalContext;
@@ -8,9 +10,11 @@ import com.griddynamics.scenario.jagger.JHttpUserScenarioStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class ExampleUserScenarioProvider implements Iterable {
     public static final String SCENARIO_ID = "my-user-scenario";
@@ -41,6 +45,20 @@ public class ExampleUserScenarioProvider implements Iterable {
                         .withPostProcessFunction(response -> {
                             if (response.getStatus().is2xxSuccessful())
                                 log.info("Step 2 is successful!");
+
+                            // Example of parsing JSON from response
+                            ObjectMapper mapper = new ObjectMapper();
+                            String jsonInString = new String((byte[]) response.getBody());
+                            Map<String, Object> result;
+                            try {
+                                result = mapper.readValue(jsonInString, new TypeReference<Map<String, Object>>(){});
+                                String origin = result.get("origin").toString();
+                                String url = result.get("url").toString();
+                                log.info("------------------------ \n Origin: {} \n ------------------------", origin);
+                                log.info("------------------------ \n URL: {} \n ------------------------", url);
+                            } catch (IOException e) {
+                                log.error("Error occurred while parsing JSON!", e);
+                            }
                             return true;
                         })
                         .build())
