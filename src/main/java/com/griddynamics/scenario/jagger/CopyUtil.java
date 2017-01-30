@@ -5,6 +5,8 @@ import com.griddynamics.jagger.invoker.v2.JHttpQuery;
 import com.griddynamics.jagger.invoker.v2.JHttpResponse;
 import org.springframework.http.HttpHeaders;
 
+import java.util.LinkedList;
+
 // TODO: move these methods as copy constructors to target classes
 public class CopyUtil {
 
@@ -48,7 +50,7 @@ public class CopyUtil {
         if (headers == null)
             return null;
         HttpHeaders headersCopy = new HttpHeaders();
-        headersCopy.putAll(headers);
+        headers.forEach((key, values) -> headersCopy.put(key, new LinkedList<>(values)));
         return headersCopy;
     }
 
