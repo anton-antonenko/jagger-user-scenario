@@ -3,6 +3,7 @@ package com.griddynamics.scenario.jagger;
 import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpQuery;
 import com.griddynamics.jagger.invoker.v2.JHttpResponse;
+import org.springframework.http.HttpHeaders;
 
 // TODO: move these methods as copy constructors to target classes
 public class CopyUtil {
@@ -41,6 +42,14 @@ public class CopyUtil {
         if (jHttpResponse == null)
             return null;
         return new JHttpResponse(jHttpResponse.getStatus(), jHttpResponse.getBody(), jHttpResponse.getHeaders());
+    }
+
+    public static HttpHeaders copyOf(HttpHeaders headers) {
+        if (headers == null)
+            return null;
+        HttpHeaders headersCopy = new HttpHeaders();
+        headersCopy.putAll(headers);
+        return headersCopy;
     }
 
 }

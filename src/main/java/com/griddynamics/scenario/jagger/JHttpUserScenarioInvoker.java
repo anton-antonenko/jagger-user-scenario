@@ -26,7 +26,7 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
         JHttpUserScenarioStep previousStep = null;
         List<JHttpUserScenarioStepInvocationResult> stepInvocationResults = new ArrayList<>();
 
-        JHttpScenarioGlobalContext localScenarioContext = scenario.getScenarioGlobalContext();
+        JHttpScenarioGlobalContext localScenarioContext = scenario.getScenarioGlobalContext().copy();
 
         for (JHttpUserScenarioStep userScenarioStep : scenario.getUserScenarioSteps()) {
             String metricId = getMetricId(scenario, userScenarioStep);

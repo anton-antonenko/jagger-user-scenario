@@ -14,6 +14,13 @@ public class JHttpScenarioGlobalContext {
     private JHttpEndpoint globalEndpoint;
     private HttpHeaders globalHeaders;
 
+    public JHttpScenarioGlobalContext copy() {
+        JHttpScenarioGlobalContext copy = new JHttpScenarioGlobalContext();
+        return copy.withBasicAuth(this.userName, this.password)
+                .withGlobalEndpoint(CopyUtil.copyOf(this.globalEndpoint))
+                .withGlobalHeaders(CopyUtil.copyOf(this.globalHeaders));
+    }
+
     /**
      * Sets endpoint for all steps.
      * Endpoint still can be overridden in {@link JHttpUserScenarioStep.Builder#withPreProcessFunction}
