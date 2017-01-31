@@ -1,7 +1,5 @@
 package com.griddynamics.scenario.jagger;
 
-import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,14 +9,17 @@ public class JHttpUserScenario {
     private Integer stepsCounter = 0;
     private final String scenarioId;
     private final String scenarioName;
-    private String userName;
-    private String password;
-    List<JHttpUserScenarioStep> userScenarioSteps = new ArrayList<>();
-    private JHttpEndpoint globalEndpoint;
+    private List<JHttpUserScenarioStep> userScenarioSteps = new ArrayList<>();
+    private JHttpScenarioGlobalContext scenarioGlobalContext;
 
     public JHttpUserScenario(String scenarioId, String scenarioName) {
         this.scenarioId = scenarioId;
         this.scenarioName = scenarioName;
+    }
+
+    public JHttpUserScenario withScenarioGlobalContext(JHttpScenarioGlobalContext scenarioGlobalContext) {
+        this.scenarioGlobalContext = scenarioGlobalContext;
+        return this;
     }
 
     public JHttpUserScenario addStep (JHttpUserScenarioStep userScenarioStep) {
@@ -28,22 +29,6 @@ public class JHttpUserScenario {
         stepsCounter++;
         userScenarioStep.setStepNumber(stepsCounter);
         userScenarioSteps.add(userScenarioStep);
-        return this;
-    }
-
-    //??? add builder in the future
-    public JHttpUserScenario withBasicAuth(String userName, String password) {
-        this.userName = userName;
-        this.password = password;
-        return this;
-    }
-
-    /** Sets endpoint for all steps.
-     * Endpoint still can be overridden in {@link JHttpUserScenarioStep.Builder#withPreProcessFunction}
-     * @param globalEndpoint global endpoint to set
-     */
-    public JHttpUserScenario withGlobalEndpoint(JHttpEndpoint globalEndpoint) {
-        this.globalEndpoint = globalEndpoint;
         return this;
     }
 
@@ -67,15 +52,7 @@ public class JHttpUserScenario {
         return userScenarioSteps.get(index);
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public JHttpEndpoint getGlobalEndpoint() {
-        return globalEndpoint;
+    public JHttpScenarioGlobalContext getScenarioGlobalContext() {
+        return scenarioGlobalContext;
     }
 }

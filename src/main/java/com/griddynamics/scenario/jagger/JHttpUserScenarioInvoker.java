@@ -2,7 +2,6 @@ package com.griddynamics.scenario.jagger;
 
 import com.griddynamics.jagger.invoker.InvocationException;
 import com.griddynamics.jagger.invoker.Invoker;
-import com.griddynamics.jagger.invoker.v2.JHttpEndpoint;
 import com.griddynamics.jagger.invoker.v2.JHttpResponse;
 import com.griddynamics.jagger.invoker.v2.SpringBasedHttpClient;
 import org.slf4j.Logger;
@@ -26,28 +25,40 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
         Boolean scenarioSucceeded = true;
         JHttpUserScenarioStep previousStep = null;
         List<JHttpUserScenarioStepInvocationResult> stepInvocationResults = new ArrayList<>();
-        JHttpEndpoint globalEndpoint = scenario.getGlobalEndpoint();
 
-        for (JHttpUserScenarioStep userScenarioStep : scenario.userScenarioSteps) {
+        JHttpScenarioGlobalContext localScenarioContext = scenario.getScenarioGlobalContext().copy();
+
+        for (JHttpUserScenarioStep userScenarioStep : scenario.getUserScenarioSteps()) {
             String metricId = getMetricId(scenario, userScenarioStep);
             String metricDisplayName = getMetricDisplayName(userScenarioStep);
 
             // Pre process step: internal setup. Can be later overridden by the user
             // Basic auth
-            if (scenario.getPassword() != null && scenario.getUserName() != null) {
-                String value = Base64.getEncoder().encodeToString((scenario.getUserName() + ":" + scenario.getPassword()).getBytes());
+            if (localScenarioContext.getPassword() != null && localScenarioContext.getUserName() != null) {
+                String value = Base64.getEncoder().encodeToString((localScenarioContext.getUserName() + ":" + localScenarioContext.getPassword()).getBytes());
                 userScenarioStep.getQuery().header("Authorization", "Basic " + value);
             }
 
-            // use global endpoint for step if present
-            if (globalEndpoint != null)
-                userScenarioStep.setEndpoint(globalEndpoint);
-            // check endpoint for null
-            if (globalEndpoint == null && userScenarioStep.getEndpoint() == null)
-                throw new IllegalArgumentException("Endpoint must not be null! Please, set global endpoint or set endpoint for every step.");
-
             // Pre process step: user actions executed before request
+            userScenarioStep.preProcessGlobalContext(previousStep, localScenarioContext);
+
             userScenarioStep.preProcess(previousStep);
+
+            // check endpoint for null
+            if (localScenarioContext.getGlobalEndpoint() == null && userScenarioStep.getEndpoint() == null)
+                throw new IllegalArgumentException("Endpoint must not be null! Please, set global endpoint or set endpoint for every step.");
+            // use global endpoint for step if step has none
+            if (userScenarioStep.getEndpoint() == null)
+                userScenarioStep.setEndpoint(localScenarioContext.getGlobalEndpoint());
+            // copy global headers and cookies to current step if query is present
+            if (localScenarioContext.getGlobalHeaders() != null && userScenarioStep.getQuery() != null) {
+                localScenarioContext.getGlobalHeaders().forEach((header, values) -> {
+                    if (userScenarioStep.getQuery().getHeaders() != null && userScenarioStep.getQuery().getHeaders().containsKey(header))
+                        userScenarioStep.getQuery().getHeaders().get(header).addAll(values);
+                    else
+                        userScenarioStep.getQuery().header(header, values);
+                });
+            }
 
             log.info("Step {}: {}", userScenarioStep.getStepNumber(), userScenarioStep.getId());
             log.info("Endpoint: {}", userScenarioStep.getEndpoint());

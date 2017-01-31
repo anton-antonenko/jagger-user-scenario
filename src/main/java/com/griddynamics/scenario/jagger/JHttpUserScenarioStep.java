@@ -17,7 +17,17 @@ public class JHttpUserScenarioStep {
     private final long waitAfterExecutionInSeconds;
     private final String displayName;
     private final BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
+    private final BiConsumer<JHttpUserScenarioStep, JHttpScenarioGlobalContext> previousStepAndContextConsumer;
     private final Function<JHttpResponse, Boolean> responseFunction;
+
+    /**
+     * Can work with results from the previous step and update global scenario context.
+     * @param previousStep previous execution step
+     */
+    public void preProcessGlobalContext(JHttpUserScenarioStep previousStep, JHttpScenarioGlobalContext scenarioContext) {
+        if (previousStepAndContextConsumer != null)
+            previousStepAndContextConsumer.accept(previousStep, scenarioContext);
+    }
 
     /**
      * Can work with results from the previous step and set proper values for endpoint & query.
@@ -57,6 +67,7 @@ public class JHttpUserScenarioStep {
         this.displayName = builder.displayName;
         this.previousAndCurrentStepConsumer = builder.previousAndCurrentStepConsumer;
         this.responseFunction = builder.responseFunction;
+        this.previousStepAndContextConsumer = builder.previousStepAndContextConsumer;
     }
 
     public static Builder builder(String id, JHttpEndpoint endpoint) {
@@ -77,6 +88,7 @@ public class JHttpUserScenarioStep {
         private long waitAfterExecutionInSeconds;
         private String displayName;
         private BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
+        private BiConsumer<JHttpUserScenarioStep, JHttpScenarioGlobalContext> previousStepAndContextConsumer;
         private Function<JHttpResponse, Boolean> responseFunction;
 
         private Builder(String id, JHttpEndpoint endpoint) {
@@ -96,6 +108,11 @@ public class JHttpUserScenarioStep {
 
         public Builder withDisplayName(String displayName) {
             this.displayName = displayName;
+            return this;
+        }
+
+        public Builder withPreProcessGlobalContextFunction(BiConsumer<JHttpUserScenarioStep, JHttpScenarioGlobalContext> previousStepAndContextConsumer) {
+            this.previousStepAndContextConsumer = previousStepAndContextConsumer;
             return this;
         }
 
