@@ -1,19 +1,25 @@
 package com.griddynamics.scenario.jagger;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 public class UserStepMetricNameUtil {
-    public static String getMetricId(JHttpUserScenario scenario, JHttpUserScenarioStep userScenarioStep) {
-        return getMetricId(scenario.getScenarioId(), userScenarioStep.getId(), userScenarioStep.getStepNumber());
+
+    // ??? will go to StandardMetricsNamesUtil
+    public static String generateScenarioStepId(String scenarioId, String stepId, Integer stepIndex) {
+        // both scenario and scenario steps will have same format of ids
+        // scenario: USER-SCENARIO_[scenarioId]_STEPNN0_[scenarioId]
+        // step:     USER-SCENARIO_[scenarioId]_STEPNN[1...N]_[stepId]
+        return "US_" + scenarioId + "_STNN" + stepIndex + "_" + stepId + "_";
     }
 
-    public static String getMetricId(String scenarioId, String userScenarioStepId, int userScenarioNumber) {
-        String prefix = "USER-SCENARIO_" + scenarioId + "_STEP#" + userScenarioNumber + "_";
-        return prefix + userScenarioStepId;
+    public static String generateScenarioId(String scenarioId) {
+        return generateScenarioStepId(scenarioId, scenarioId, 0);
     }
 
-    public static String getMetricDisplayName(JHttpUserScenarioStep userScenarioStep) {
-        String prefix = userScenarioStep.getStepNumber() + ". ";
-        return prefix + (isBlank(userScenarioStep.getDisplayName()) ? userScenarioStep.getId() : userScenarioStep.getDisplayName());
+    public static String generateMetricId(String id, String metricId) {
+        return id + "METR_" + metricId + "_";
     }
+
+    public static String generateMetricDisplayName(String displayName, String metricDisplayName) {
+        return displayName + " " + metricDisplayName;
+    }
+
 }

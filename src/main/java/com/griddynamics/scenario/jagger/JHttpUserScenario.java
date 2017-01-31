@@ -8,13 +8,13 @@ import static java.lang.String.format;
 public class JHttpUserScenario {
     private Integer stepsCounter = 0;
     private final String scenarioId;
-    private final String scenarioName;
+    private final String scenarioDisplayName;
     private List<JHttpUserScenarioStep> userScenarioSteps = new ArrayList<>();
     private JHttpScenarioGlobalContext scenarioGlobalContext;
 
-    public JHttpUserScenario(String scenarioId, String scenarioName) {
+    public JHttpUserScenario(String scenarioId, String scenarioDisplayName) {
         this.scenarioId = scenarioId;
-        this.scenarioName = scenarioName;
+        this.scenarioDisplayName = scenarioDisplayName;
     }
 
     public JHttpUserScenario withScenarioGlobalContext(JHttpScenarioGlobalContext scenarioGlobalContext) {
@@ -23,8 +23,8 @@ public class JHttpUserScenario {
     }
 
     public JHttpUserScenario addStep (JHttpUserScenarioStep userScenarioStep) {
-        if (!isStepIdUnique(userScenarioStep.getId())) {
-            throw new IllegalArgumentException(format("Step id '%s' is not unique!", userScenarioStep.getId()));
+        if (!isStepIdUnique(userScenarioStep.getStepId())) {
+            throw new IllegalArgumentException(format("Step id '%s' is not unique!", userScenarioStep.getStepId()));
         }
         stepsCounter++;
         userScenarioStep.setStepNumber(stepsCounter);
@@ -33,15 +33,15 @@ public class JHttpUserScenario {
     }
 
     private boolean isStepIdUnique(String id) {
-        return userScenarioSteps.stream().map(JHttpUserScenarioStep::getId).noneMatch(stepId -> stepId.equals(id));
+        return userScenarioSteps.stream().map(JHttpUserScenarioStep::getStepId).noneMatch(stepId -> stepId.equals(id));
     }
 
     public String getScenarioId() {
         return scenarioId;
     }
 
-    public String getScenarioName() {
-        return scenarioName;
+    public String getScenarioDisplayName() {
+        return scenarioDisplayName;
     }
 
     public List<JHttpUserScenarioStep> getUserScenarioSteps() {

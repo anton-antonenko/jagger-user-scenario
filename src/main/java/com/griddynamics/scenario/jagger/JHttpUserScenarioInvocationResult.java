@@ -4,23 +4,23 @@ import java.util.List;
 
 public class JHttpUserScenarioInvocationResult {
     private final List<JHttpUserScenarioStepInvocationResult> stepInvocationResults;
-    private final String scenarioMetricId;
-    private final String scenarioMetricDisplayName;
+    private final String scenarioId;
+    private final String scenarioDisplayName;
     private final Boolean succeeded;
 
-    public JHttpUserScenarioInvocationResult(List<JHttpUserScenarioStepInvocationResult> stepInvocationResults, String scenarioMetricId, String scenarioMetricDisplayName, Boolean succeeded) {
+    public JHttpUserScenarioInvocationResult(List<JHttpUserScenarioStepInvocationResult> stepInvocationResults, String scenarioId, String scenarioDisplayName, Boolean succeeded) {
         this.stepInvocationResults = stepInvocationResults;
-        this.scenarioMetricId = scenarioMetricId;
-        this.scenarioMetricDisplayName = scenarioMetricDisplayName;
+        this.scenarioId = scenarioId;
+        this.scenarioDisplayName = scenarioDisplayName;
         this.succeeded = succeeded;
     }
 
-    public String getScenarioMetricId() {
-        return scenarioMetricId;
+    public String getScenarioId() {
+        return scenarioId;
     }
 
-    public String getScenarioMetricDisplayName() {
-        return scenarioMetricDisplayName;
+    public String getScenarioDisplayName() {
+        return scenarioDisplayName;
     }
 
     public List<JHttpUserScenarioStepInvocationResult> getStepInvocationResults() {
