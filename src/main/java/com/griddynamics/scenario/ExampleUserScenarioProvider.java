@@ -22,7 +22,7 @@ public class ExampleUserScenarioProvider implements Iterable {
     public static final String STEP_1_ID = "step321";
     public static final String STEP_2_ID = "step2";
     public static final String STEP_3_ID = "step3";
-    public static final String SCENARIO_ID_AUTH_AUTO = "my-user-scenario-basic-auth-auto";
+    public static final String SCENARIO_ID_AUTH_AUTO = "my-user-scenario-basic-auth";
     public static final String SCENARIO_DISPLAY_NAME_AUTH_AUTO = "Basic Auth User Scenario";
 
     private static Logger log = LoggerFactory.getLogger(ExampleUserScenarioProvider.class);
@@ -87,12 +87,12 @@ public class ExampleUserScenarioProvider implements Iterable {
                 )
                 .addStep(JHttpUserScenarioStep.builder("basic_auto_1")
                         .withQuery(new JHttpQuery().get().path("/basic-auth/userName/userPassword"))
-                        .withDisplayName("Expected auth pass")
+                        .withDisplayName("Auth pass")
                         .withWaitAfterExecutionInSeconds(2)
                         .build())
                 .addStep(JHttpUserScenarioStep.builder("basic_auto_2")
                         .withQuery(new JHttpQuery().get().path("/basic-auth/userName/userPassword"))
-                        .withDisplayName("Expected auth pass with validation")
+                        .withDisplayName("Auth pass (validation)")
                         .withWaitAfterExecutionInSeconds(2)
                         .withPostProcessFunction(response -> {
                             Boolean result = true;
@@ -105,7 +105,7 @@ public class ExampleUserScenarioProvider implements Iterable {
                         .build())
                 .addStep(JHttpUserScenarioStep.builder("basic_auto_3")
                         .withQuery(new JHttpQuery().get().path("/basic-auth/userName/userPassword"))
-                        .withDisplayName("Expected auth fail with validation")
+                        .withDisplayName("Auth fail (validation)")
                         .withWaitAfterExecutionInSeconds(2)
                         .withPreProcessFunction((prevStep, currentStep) -> {
                             // Reset all headers => auth will fail

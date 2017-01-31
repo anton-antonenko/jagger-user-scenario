@@ -1,24 +1,24 @@
 package com.griddynamics.scenario.jagger;
 
 public class JHttpUserScenarioStepInvocationResult {
-    private final String metricId;
-    private final String metricDisplayName;
+    private final String stepId;
+    private final String stepDisplayName;
     private final Number latency;
     private final Boolean succeeded;
 
-    public JHttpUserScenarioStepInvocationResult(String metricId, String metricDisplayName, Number latency, Boolean succeeded) {
-        this.metricId = metricId;
-        this.metricDisplayName = metricDisplayName;
+    public JHttpUserScenarioStepInvocationResult(String stepId, String stepDisplayName, Number latency, Boolean succeeded) {
+        this.stepId = stepId;
+        this.stepDisplayName = stepDisplayName;
         this.latency = latency;
         this.succeeded = succeeded;
     }
 
-    public String getMetricId() {
-        return metricId;
+    public String getStepId() {
+        return stepId;
     }
 
-    public String getMetricDisplayName() {
-        return metricDisplayName;
+    public String getStepDisplayName() {
+        return stepDisplayName;
     }
 
     public Number getLatency() {

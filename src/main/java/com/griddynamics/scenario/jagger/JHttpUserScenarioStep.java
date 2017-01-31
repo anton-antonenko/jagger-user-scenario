@@ -10,12 +10,12 @@ import java.util.function.Function;
 
 public class JHttpUserScenarioStep {
     private int stepNumber;
-    private final String id; // mandatory parameter. required for metrics saving
+    private final String stepId; // mandatory parameter. required for metrics saving
     private JHttpEndpoint endpoint;
     private JHttpQuery query;
     private JHttpResponse response;
     private final long waitAfterExecutionInSeconds;
-    private final String displayName;
+    private final String stepDisplayName; // should be equal to stepId if not defined
     private final BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
     private final BiConsumer<JHttpUserScenarioStep, JHttpScenarioGlobalContext> previousStepAndContextConsumer;
     private final Function<JHttpResponse, Boolean> responseFunction;
@@ -60,11 +60,11 @@ public class JHttpUserScenarioStep {
     }
 
     private JHttpUserScenarioStep(Builder builder) {
-        this.id = builder.id;
+        this.stepId = builder.stepId;
         this.endpoint = builder.endpoint;
         this.query = builder.query;
         this.waitAfterExecutionInSeconds = builder.waitAfterExecutionInSeconds;
-        this.displayName = builder.displayName;
+        this.stepDisplayName = (builder.stepDisplayName == null) ? builder.stepId : builder.stepDisplayName;
         this.previousAndCurrentStepConsumer = builder.previousAndCurrentStepConsumer;
         this.responseFunction = builder.responseFunction;
         this.previousStepAndContextConsumer = builder.previousStepAndContextConsumer;
@@ -75,24 +75,24 @@ public class JHttpUserScenarioStep {
     }
 
     /** Use this method only if you set global endpoint!!!
-     * @param id step id
+     * @param id step stepId
      */
     public static Builder builder(String id) {
         return new Builder(id, null);
     }
 
     public static class Builder {
-        private final String id;
+        private final String stepId;
         private final JHttpEndpoint endpoint;
         private JHttpQuery query;
         private long waitAfterExecutionInSeconds;
-        private String displayName;
+        private String stepDisplayName;
         private BiConsumer<JHttpUserScenarioStep, JHttpUserScenarioStep> previousAndCurrentStepConsumer;
         private BiConsumer<JHttpUserScenarioStep, JHttpScenarioGlobalContext> previousStepAndContextConsumer;
         private Function<JHttpResponse, Boolean> responseFunction;
 
-        private Builder(String id, JHttpEndpoint endpoint) {
-            this.id = id;
+        private Builder(String stepId, JHttpEndpoint endpoint) {
+            this.stepId = stepId;
             this.endpoint = endpoint;
         }
 
@@ -107,7 +107,7 @@ public class JHttpUserScenarioStep {
         }
 
         public Builder withDisplayName(String displayName) {
-            this.displayName = displayName;
+            this.stepDisplayName = displayName;
             return this;
         }
 
@@ -161,12 +161,12 @@ public class JHttpUserScenarioStep {
         return CopyUtil.copyOf(response);
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getStepDisplayName() {
+        return stepDisplayName;
     }
 
-    public String getId() {
-        return id;
+    public String getStepId() {
+        return stepId;
     }
 
     public int getStepNumber() {

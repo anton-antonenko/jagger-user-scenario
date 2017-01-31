@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.getMetricDisplayName;
-import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.getMetricId;
-
 public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenarioInvocationResult, JHttpUserScenario> {
 
     private final SpringBasedHttpClient httpClient = new SpringBasedHttpClient();
@@ -29,8 +26,6 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
         JHttpScenarioGlobalContext localScenarioContext = scenario.getScenarioGlobalContext().copy();
 
         for (JHttpUserScenarioStep userScenarioStep : scenario.getUserScenarioSteps()) {
-            String metricId = getMetricId(scenario, userScenarioStep);
-            String metricDisplayName = getMetricDisplayName(userScenarioStep);
 
             // Pre process step: internal setup. Can be later overridden by the user
             // Basic auth
@@ -41,7 +36,6 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
 
             // Pre process step: user actions executed before request
             userScenarioStep.preProcessGlobalContext(previousStep, localScenarioContext);
-
             userScenarioStep.preProcess(previousStep);
 
             // check endpoint for null
@@ -60,7 +54,7 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
                 });
             }
 
-            log.info("Step {}: {}", userScenarioStep.getStepNumber(), userScenarioStep.getId());
+            log.info("Step {}: {}", userScenarioStep.getStepNumber(), userScenarioStep.getStepId());
             log.info("Endpoint: {}", userScenarioStep.getEndpoint());
             log.info("Query: {}", userScenarioStep.getQuery());
 
@@ -77,16 +71,18 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
 
             // Post process step: executed after request. If returned false, scenario invocation stops.
             Boolean succeeded = userScenarioStep.postProcess(response);
-            stepInvocationResults.add(new JHttpUserScenarioStepInvocationResult(metricId, metricDisplayName, requestTimeInMilliseconds, succeeded));
+            stepInvocationResults.add(new JHttpUserScenarioStepInvocationResult(userScenarioStep.getStepId(), userScenarioStep.getStepDisplayName(),
+                    requestTimeInMilliseconds, succeeded));
             previousStep = userScenarioStep;
 
             if (!succeeded) {
                 scenarioSucceeded = false;
-                log.error("Step {} post process returned false! Stopping scenario (next steps won't be executed).", userScenarioStep.getId());
+                log.error("Step {} '{}' post process returned false! Stopping scenario (next steps won't be executed).",
+                        userScenarioStep.getStepId(), userScenarioStep.getStepDisplayName());
                 break;
             }
         }
 
-        return new JHttpUserScenarioInvocationResult(stepInvocationResults, scenario.getScenarioId(), scenario.getScenarioName(), scenarioSucceeded);
+        return new JHttpUserScenarioInvocationResult(stepInvocationResults, scenario.getScenarioId(), scenario.getScenarioDisplayName(), scenarioSucceeded);
     }
 }

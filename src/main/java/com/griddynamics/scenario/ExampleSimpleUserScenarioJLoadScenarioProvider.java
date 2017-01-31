@@ -18,12 +18,14 @@ import com.griddynamics.jagger.user.test.configurations.termination.JTermination
 import com.griddynamics.jagger.user.test.configurations.termination.JTerminationCriteriaIterations;
 import com.griddynamics.jagger.user.test.configurations.termination.auxiliary.IterationsNumber;
 import com.griddynamics.jagger.user.test.configurations.termination.auxiliary.MaxDurationInSeconds;
+import com.griddynamics.jagger.util.StandardMetricsNamesUtil;
 import com.griddynamics.scenario.jagger.JHttpUserScenarioInvocationListener;
 import com.griddynamics.scenario.jagger.JHttpUserScenarioInvokerProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.getMetricId;
+import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.generateMetricId;
+import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.generateScenarioStepId;
 
 // begin: following section is used for docu generation - Load test scenario configuration
 @Configuration
@@ -37,13 +39,15 @@ public class ExampleSimpleUserScenarioJLoadScenarioProvider {
                 .addListener(new JHttpUserScenarioInvocationListener())
                 .build();
 
-        JLoadProfile jLoadProfileInvocations = JLoadProfileInvocation.builder(InvocationCount.of(10), ThreadCount.of(1)).build();
+        JLoadProfile jLoadProfileInvocations = JLoadProfileInvocation.builder(InvocationCount.of(100), ThreadCount.of(2)).build();
 
-        JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations.of(IterationsNumber.of(500), MaxDurationInSeconds.of(15));
+        JTerminationCriteria jTerminationCriteria = JTerminationCriteriaIterations.of(IterationsNumber.of(500), MaxDurationInSeconds.of(50));
 
-        String metricId = getMetricId(ExampleUserScenarioProvider.SCENARIO_ID, ExampleUserScenarioProvider.STEP_1_ID, 1);
-        JLimit firstStepLimit = JLimitVsRefValue.builder(metricId + "-avg", RefValue.of(300D))
-                .withOnlyErrors(LowErrThresh.of(0.99), UpErrThresh.of(1.01))
+        //??? will need to rework. too complex
+        String stepId = generateScenarioStepId(ExampleUserScenarioProvider.SCENARIO_ID, ExampleUserScenarioProvider.STEP_1_ID, 1);
+        String metricId = generateMetricId(stepId, StandardMetricsNamesUtil.LATENCY_ID);
+        JLimit firstStepLimit = JLimitVsRefValue.builder(metricId + "-avg", RefValue.of(1.5))
+                .withOnlyErrors(LowErrThresh.of(0.8), UpErrThresh.of(1.2))
                 .build();
 
         JLoadTest jLoadTest = JLoadTest.builder(Id.of("lt_example"), jTestDefinition, jLoadProfileInvocations, jTerminationCriteria)

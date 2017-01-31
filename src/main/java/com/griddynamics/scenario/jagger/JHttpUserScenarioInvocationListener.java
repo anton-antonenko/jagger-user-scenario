@@ -8,26 +8,16 @@ import com.griddynamics.jagger.engine.e1.collector.invocation.InvocationListener
 import com.griddynamics.jagger.engine.e1.services.ServicesAware;
 import com.griddynamics.jagger.invoker.InvocationException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.AVG_AGGREGATOR;
-import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.FAILS_AGGREGATOR;
-import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.MAX_AGGREGATOR;
-import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.MIN_AGGREGATOR;
-import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.PERCENTILE_AGGREGATOR;
-import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.STD_DEV_AGGREGATOR;
-import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.SUCCESS_AGGREGATOR;
+import static com.griddynamics.jagger.util.StandardMetricsNamesUtil.*;
+import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.*;
+import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.*;
 
 public class JHttpUserScenarioInvocationListener extends ServicesAware implements Provider<InvocationListener> {
-    public static final String SUCCESS_RATE_METRIC_SUFFIX = "-sr";
-    public static final String ITERATIONS_METRIC_SUFFIX = "-iterations";
     private final Set<String> createdMetrics = new ConcurrentSkipListSet<>();
     private List<MetricAggregatorProvider> latencyAggregatorProviders = new ArrayList<>();
 
@@ -77,66 +67,88 @@ public class JHttpUserScenarioInvocationListener extends ServicesAware implement
                 if (invocationInfo.getResult() != null) {
                     JHttpUserScenarioInvocationResult invocationResult = ((JHttpUserScenarioInvocationResult) invocationInfo.getResult());
                     List<JHttpUserScenarioStepInvocationResult> stepInvocationResults = invocationResult.getStepInvocationResults();
+                    String scenarioId = generateScenarioId(invocationResult.getScenarioId());
 
-                    if (!createdMetrics.contains(invocationResult.getScenarioMetricId())) {
-                        createdMetrics.add(invocationResult.getScenarioMetricId());
-                        createScenarioDurationMetricDescription(invocationResult.getScenarioMetricId(), invocationResult.getScenarioMetricDisplayName());
-                        createScenarioSuccessRateMetricDescription(invocationResult.getScenarioMetricId() + SUCCESS_RATE_METRIC_SUFFIX, invocationResult.getScenarioMetricDisplayName());
-                        createIterationsMetricDescription(invocationResult.getScenarioMetricId() + ITERATIONS_METRIC_SUFFIX, invocationResult.getScenarioMetricDisplayName());
+                    // Create & save scenario metrics
+                    if (!createdMetrics.contains(scenarioId)) {
+                        createdMetrics.add(scenarioId);
+                        createScenarioMetricDescriptions(scenarioId, invocationResult.getScenarioDisplayName());
                     }
-                    getMetricService().saveValue(invocationResult.getScenarioMetricId(), invocationInfo.getDuration());
-                    getMetricService().saveValue(invocationResult.getScenarioMetricId() + SUCCESS_RATE_METRIC_SUFFIX, invocationResult.getSucceeded() ? 1 : 0);
-                    getMetricService().saveValue(invocationResult.getScenarioMetricId() + ITERATIONS_METRIC_SUFFIX, 1);
+                    getMetricService().saveValue(generateMetricId(scenarioId, ITERATION_SAMPLES_ID), 1);
+                    getMetricService().saveValue(generateMetricId(scenarioId, LATENCY_ID),
+                            invocationInfo.getDuration() / 1000.0); // ms -> s
+                    getMetricService().saveValue(generateMetricId(scenarioId, SUCCESS_RATE), invocationResult.getSucceeded() ? 1 : 0);
 
-                    stepInvocationResults.forEach(result -> {
-                        String metricId = result.getMetricId();
-                        if (!createdMetrics.contains(metricId)) {
-                            createdMetrics.add(metricId);
-                            String displayName = result.getMetricDisplayName();
-                            createStepLatencyMetricDescription(metricId, displayName);
-                            createStepSuccessRateMetricDescription(metricId + SUCCESS_RATE_METRIC_SUFFIX, displayName);
-                            createIterationsMetricDescription(metricId + ITERATIONS_METRIC_SUFFIX, displayName);
+
+                    // Create & save step metrics
+                    Integer stepIndex = 1; // index 0 for scenario (not steps) metrics
+                    for (JHttpUserScenarioStepInvocationResult stepResult : stepInvocationResults) {
+                        String scenarioStepId = generateScenarioStepId(invocationResult.getScenarioId(), stepResult.getStepId(), stepIndex);
+                        if (!createdMetrics.contains(scenarioStepId)) {
+                            createdMetrics.add(scenarioStepId);
+                            createScenarioStepMetricDescriptions(scenarioStepId,String.format("%02d. %s ", stepIndex, stepResult.getStepDisplayName()));
                         }
-                        getMetricService().saveValue(metricId, result.getLatency());
-                        getMetricService().saveValue(metricId + SUCCESS_RATE_METRIC_SUFFIX, result.getSucceeded() ? 1 : 0);
-                        getMetricService().saveValue(metricId + ITERATIONS_METRIC_SUFFIX, 1);
-                    });
+                        getMetricService().saveValue(generateMetricId(scenarioStepId, LATENCY_ID),
+                                stepResult.getLatency().doubleValue() / 1000); // ms -> s
+                        getMetricService().saveValue(generateMetricId(scenarioStepId, SUCCESS_RATE), stepResult.getSucceeded() ? 1 : 0);
+                        getMetricService().saveValue(generateMetricId(scenarioStepId, ITERATION_SAMPLES_ID), 1);
+
+                        stepIndex++;
+                    }
                 }
             }
 
-            private void createIterationsMetricDescription(String metricId, String metricDisplayName) {
-                getMetricService().createMetric(new MetricDescription(metricId).displayName(metricDisplayName + " Iterations"));
+            private void createScenarioMetricDescriptions(String scenarioId, String scenarioDisplayName) {
+                getMetricService().createMetric(
+                        new MetricDescription(generateMetricId(scenarioId, ITERATION_SAMPLES_ID)).
+                                displayName(generateMetricDisplayName(scenarioDisplayName, ITERATIONS_SAMPLES)).
+                                addAggregator(SUM_AGGREGATOR));
+
+                getMetricService().createMetric(
+                        new MetricDescription(generateMetricId(scenarioId, LATENCY_ID)).
+                                displayName(generateMetricDisplayName(scenarioDisplayName, LATENCY_SEC)).
+                                addAggregator(AVG_AGGREGATOR));
+
+                getMetricService().createMetric(
+                        new MetricDescription(generateMetricId(scenarioId, SUCCESS_RATE)).
+                                displayName(generateMetricDisplayName(scenarioDisplayName, SUCCESS_RATE)).
+                                plotData(true).
+                                addAggregator(SUCCESS_AGGREGATOR).
+                                addAggregator(FAILS_AGGREGATOR));
             }
 
-            private void createScenarioDurationMetricDescription(String metricId, String metricDisplayName) {
-                getMetricService().createMetric(new MetricDescription(metricId).displayName(metricDisplayName + " Duration, ms"));
-            }
-
-            private void createScenarioSuccessRateMetricDescription(String metricId, String metricDisplayName) {
-                MetricDescription metricDescription = new MetricDescription(metricId).displayName(metricDisplayName + " Success Rate").plotData(true);
-                newArrayList(SUCCESS_AGGREGATOR, FAILS_AGGREGATOR).forEach(metricDescription::addAggregator);
-                getMetricService().createMetric(metricDescription);
-            }
-
-            private void createStepLatencyMetricDescription(String metricId, String displayName) {
-                MetricDescription metricDescription = new MetricDescription(metricId).displayName(displayName + " Latency, ms").plotData(true);
+            private void createScenarioStepMetricDescriptions(String scenarioStepId, String scenarioStepDisplayName) {
+                MetricDescription metricDescription =
+                        new MetricDescription(generateMetricId(scenarioStepId,LATENCY_ID)).
+                                displayName(generateMetricDisplayName(scenarioStepDisplayName,LATENCY_SEC))
+                                .plotData(true);
                 if (latencyAggregatorProviders.isEmpty())
                     latencyAggregatorProviders.addAll(newHashSet(MAX_AGGREGATOR, MIN_AGGREGATOR, STD_DEV_AGGREGATOR, AVG_AGGREGATOR));
                 latencyAggregatorProviders.forEach(metricDescription::addAggregator);
                 getMetricService().createMetric(metricDescription);
-            }
 
-            private void createStepSuccessRateMetricDescription(String metricId, String displayName) {
-                MetricDescription metricDescription = new MetricDescription(metricId).displayName(displayName + " Success rate").plotData(true);
-                newArrayList(SUCCESS_AGGREGATOR, FAILS_AGGREGATOR).forEach(metricDescription::addAggregator);
-                getMetricService().createMetric(metricDescription);
+                getMetricService().createMetric(
+                        new MetricDescription(generateMetricId(scenarioStepId, ITERATION_SAMPLES_ID)).
+                                displayName(generateMetricDisplayName(scenarioStepDisplayName, ITERATIONS_SAMPLES)).
+                                addAggregator(SUM_AGGREGATOR));
+
+                getMetricService().createMetric(
+                        new MetricDescription(generateMetricId(scenarioStepId, SUCCESS_RATE)).
+                                displayName(generateMetricDisplayName(scenarioStepDisplayName, SUCCESS_RATE)).
+                                plotData(true).
+                                addAggregator(SUCCESS_AGGREGATOR).
+                                addAggregator(FAILS_AGGREGATOR));
             }
 
             @Override
-            public void onFail(InvocationInfo invocationInfo, InvocationException e) { }
+            public void onFail(InvocationInfo invocationInfo, InvocationException e) {
+                //??? scenario success rate and iterations?
+            }
 
             @Override
-            public void onError(InvocationInfo invocationInfo, Throwable error) { }
+            public void onError(InvocationInfo invocationInfo, Throwable error) {
+                //??? scenario success rate and iterations?
+            }
         };
     }
 }
