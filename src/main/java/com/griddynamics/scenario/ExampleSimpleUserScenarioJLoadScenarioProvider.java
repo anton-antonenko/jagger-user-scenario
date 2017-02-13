@@ -24,8 +24,8 @@ import com.griddynamics.scenario.jagger.JHttpUserScenarioInvokerProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.generateMetricId;
-import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.generateScenarioStepId;
+import static com.griddynamics.jagger.util.StandardMetricsNamesUtil.generateMetricId;
+import static com.griddynamics.jagger.util.StandardMetricsNamesUtil.generateScenarioStepId;
 
 // begin: following section is used for docu generation - Load test scenario configuration
 @Configuration

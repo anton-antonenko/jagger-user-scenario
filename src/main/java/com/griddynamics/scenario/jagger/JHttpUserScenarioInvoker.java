@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenarioInvocationResult, JHttpUserScenario> {
 
     private final SpringBasedHttpClient httpClient = new SpringBasedHttpClient();
@@ -47,10 +49,13 @@ public class JHttpUserScenarioInvoker implements Invoker<Void, JHttpUserScenario
             // copy global headers and cookies to current step if query is present
             if (localScenarioContext.getGlobalHeaders() != null && userScenarioStep.getQuery() != null) {
                 localScenarioContext.getGlobalHeaders().forEach((header, values) -> {
-                    if (userScenarioStep.getQuery().getHeaders() != null && userScenarioStep.getQuery().getHeaders().containsKey(header))
-                        userScenarioStep.getQuery().getHeaders().get(header).addAll(values);
-                    else
+                    if (userScenarioStep.getQuery().getHeaders() != null && userScenarioStep.getQuery().getHeaders().containsKey(header)) {
+                        List<String> newValues = newArrayList(userScenarioStep.getQuery().getHeaders().get(header));
+                        newValues.addAll(values);
+                        userScenarioStep.getQuery().getHeaders().put(header, newValues);
+                    } else {
                         userScenarioStep.getQuery().header(header, values);
+                    }
                 });
             }
 

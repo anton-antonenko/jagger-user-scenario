@@ -15,7 +15,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.griddynamics.jagger.util.StandardMetricsNamesUtil.*;
 import static com.griddynamics.scenario.jagger.DefaultAggregatorsProvider.*;
-import static com.griddynamics.scenario.jagger.UserStepMetricNameUtil.*;
 
 public class JHttpUserScenarioInvocationListener extends ServicesAware implements Provider<InvocationListener> {
     private final Set<String> createdMetrics = new ConcurrentSkipListSet<>();
